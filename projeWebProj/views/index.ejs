@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title> Project </title>
+    <script src="/public/js/jquery-3.2.1.js"></script>
+    <script src="/public/js/bootstrap.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <link rel="stylesheet" href="/public/css/bootstrap.css">
+    <link rel="stylesheet" href="/public/css/font-awesome.css">
+
+    <style>
+        .jumbotron {
+            background-color: #4D90FE;
+            color: ghostwhite;
+        }
+
+        .jumbotron h1 {
+            color: ghostwhite;
+        }
+    </style>
+
+</head>
+<body>
+<div class="jumbotron text-center">
+    <h1>Organize</h1>
+    <p>TO DO LIST</p>
+    <button class="btn btn-lg btn-success" onclick="window.location = '/create'">CREATE + </button>
+</div>
+<div class="container-fluid">
+    <% for (var i =0 ; i < data.length ; i++ ) { %>
+        <div class="col-sm-3">
+            <div class="panel panel-primary text-center">
+                <div class="panel-heading"></div>
+                <div class="panel-body task">
+                    <p id="<%= data[i]._id %>" style="display: none"></p>
+                    <p><%= data[i].creator %></p>
+                    <p><%= data[i].date %></p>
+                    <p><%= data[i].category %></p>
+                </div>
+                <div class="panel-footer">
+                    <h4><%= data[i].name %></h4>
+                    <button class="btn btn-sm btn-success" onclick="done('<%= data[i]._id %>');">Done !</button>
+                </div>
+            </div>
+        </div>
+    <% } %>
+</div>
+<script>
+        var socket = io.connect('/');
+
+        function done(val) {
+            var $div = $("#"+val).parent().parent();
+            $div.removeClass('panel-primary').addClass('panel-danger');
+            socket.emit('delete task',val);
+        }
+
+        socket.on('task deleted',(data)=>{
+            var $div = $("#"+data.id).parent().parent();
+            $div.removeClass('panel-primary').addClass('panel-danger');
+            console.log('received');
+        });
+
+
+</script>
+</body>
+</html>
